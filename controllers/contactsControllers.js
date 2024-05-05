@@ -1,56 +1,81 @@
-import { listContacts, getContactById, removeContact, addContact, updateContactId }
-from "../services/contactsServices.js";
-import HttpError from "../helpers/HttpError.js";
 
-export const getAllContacts = async (req, res) => {
-const contacts = await listContacts();
-res.json(contacts); 
+import HttpError from "../helpers/HttpError.js";
+import Contact from "../model/contactModel.js";
+
+export const getAllContacts = async (_, res, next) => {
+  try {
+    const contacts = await Contact.find();
+    res.json(contacts);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getOneContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const contact = await getContactById(id);
-        if (!contact) {
-          throw HttpError(404);
-        }
-        res.json(contact);
-      } catch (error) {
-        next(error);
-      }
-    
+  try {
+    const { id } = req.params;
+    const contact = await Contact.findById(id);
+    if (!contact) {
+      throw HttpError(404);
+    }
+    res.json(contact);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const deleteContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const contact = await removeContact(id);
-        if (!contact) {
-          throw HttpError(404);
-        }
-        res.json(contact);
-      } catch (error) {
-        next(error);
-      }
+  try {
+    const { id } = req.params;
+    const contact = await Contact.findByIdAndDelete(id);
+    if (!contact) {
+      throw HttpError(404);
+    }
+    res.json(contact);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const createContact = async (req, res) => {
-    const contact = req.body;
-    const newContact = await addContact(contact);
-  res.status(201).json(newContact);
+export const createContact = async (req, res, next) => {
+  try { 
+    const contact = await Contact.create(req.body);
+    res.status(201).json(contact);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateContact = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const updatedContact = await updateContactId(id, req.body);
-  
-      if (!updatedContact) {
-        throw HttpError(404);
-      }
-  
-      res.json(updatedContact);
-    } catch (error) {
-      next(error);
+  try {
+    const { id } = req.params;
+    const contact = await Contact.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if (!contact) {
+      throw HttpError(404);
     }
-  };
+
+    res.json(contact);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStatusContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const contact = await Contact.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if (!contact) {
+      throw HttpError(404);
+    }
+
+    res.json(contact);
+  } catch (error) {
+    next(error);
+  }
+};
