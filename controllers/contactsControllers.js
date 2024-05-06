@@ -1,6 +1,7 @@
 
 import HttpError from "../helpers/HttpError.js";
 import Contact from "../model/contactModel.js";
+import mongoose from "mongoose";
 
 export const getAllContacts = async (_, res, next) => {
   try {
@@ -14,6 +15,10 @@ export const getAllContacts = async (_, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw HttpError(400);
+    }
+
     const contact = await Contact.findById(id);
     if (!contact) {
       throw HttpError(404);
@@ -27,6 +32,9 @@ export const getOneContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw HttpError(400);
+    }
     const contact = await Contact.findByIdAndDelete(id);
     if (!contact) {
       throw HttpError(404);
@@ -49,6 +57,9 @@ export const createContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw HttpError(400);
+    }
     const contact = await Contact.findByIdAndUpdate(id, req.body, {
       new: true,
     });
@@ -66,6 +77,9 @@ export const updateContact = async (req, res, next) => {
 export const updateStatusContact = async (req, res, next) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw HttpError(400);
+    }
     const contact = await Contact.findByIdAndUpdate(id, req.body, {
       new: true,
     });
