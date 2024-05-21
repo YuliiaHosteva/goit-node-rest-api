@@ -8,7 +8,7 @@ import {
 } from "../controllers/authControllers.js";
 import { userSchema, subscriptionSchema } from "../schemas/usersSchemas.js";
 import validateBody from "../helpers/validateBody.js";
-import checkToken from "../middlewares/checkToken.js";
+import authToken from "../middlewares/auth.js";
 
 const authRouter = express.Router();
 
@@ -16,13 +16,13 @@ authRouter.post("/register", validateBody(userSchema), register);
 
 authRouter.post("/login", validateBody(userSchema), login);
 
-authRouter.get("/logout", checkToken, logout);
+authRouter.get("/logout", authToken, logout);
 
-authRouter.get("/current", checkToken, getCurrentUser);
+authRouter.get("/current", authToken, getCurrentUser);
 
 authRouter.patch(
   "",
-  checkToken,
+  authToken,
   validateBody(subscriptionSchema),
   changeSubscription
 );

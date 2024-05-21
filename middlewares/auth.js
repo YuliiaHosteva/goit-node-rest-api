@@ -1,8 +1,8 @@
-import User from "../model/user.js";
+import User from "../model/userModel.js";
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 
-const checkToken = async (req, res, next) => {
+const authToken = async (req, res, next) => {
   const authorizationHeader = req.headers.authorization;
 
   if (!authorizationHeader) {
@@ -11,7 +11,7 @@ const checkToken = async (req, res, next) => {
 
   const [bearer, token] = authorizationHeader.split(" ", 2);
 
-  if (bearer !== "Bearer") {
+  if (bearer !== "Bearer" || !token) {
     throw HttpError(401, "Not authorized");
   }
 
@@ -28,7 +28,7 @@ const checkToken = async (req, res, next) => {
     }
 
     req.user = {
-      id: user._id,
+      _id: user._id,
     };
 
     next();
@@ -37,4 +37,4 @@ const checkToken = async (req, res, next) => {
   }
 };
 
-export default checkToken;
+export default authToken;

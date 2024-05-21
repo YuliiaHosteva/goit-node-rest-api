@@ -1,13 +1,14 @@
+import path from "node:path";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
 import "dotenv/config";
 
-import contactsRouter from "./routes/contactsRouter.js";
-import authRouter from "./routes/authRouter.js";
-import checkToken from "./middlewares/checkToken.js";
-
+import contactsRoutes from "./routes/contactsRouter.js";
+import authRoutes from "./routes/authRouter.js";
+import authToken from "./middlewares/auth.js";
+import userRoutes from "./routes/usersRouter.js"
 
 
 const app = express();
@@ -28,9 +29,9 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRouter);
-app.use("/api/contacts", checkToken, contactsRouter);
-app.use("/api/users", authRouter);
+app.use("/api/contacts", authToken, contactsRoutes);
+app.use("/api/users", authRoutes, userRoutes);
+app.use("/avatars", express.static(path.resolve("public/avatars")));
 
 
 app.use((_, res) => {

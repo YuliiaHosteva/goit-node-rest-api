@@ -1,7 +1,8 @@
-import User from "../model/user.js";
+import User from "../model/userModel.js";
 import HttpError from "../helpers/HttpError.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
 
 const register = async (req, res, next) => {
   try {
@@ -13,13 +14,19 @@ const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatarURL = gravatar.url(email);
 
-    await User.create({ email, password: hashedPassword });
+    const newUser = await User.create({ 
+      email, 
+      password: hashedPassword, 
+      subscription,
+      avatarURL });
 
     res.send({
       user: {
-        email,
-        subscription: subscription || "starter",
+        email: newUser.email,
+        subscription: newUser.subscription || "starter",
+        avatarURL: newUser.avatarURL,
       },
     });
   } catch (error) {
@@ -52,8 +59,9 @@ const login = async (req, res, next) => {
     res.send({
       token,
       user: {
-        email,
+        email: user.email,
         subscription: user.subscription,
+        avatarURL: user.avatarURL
       },
     });
   } catch (error) {
@@ -63,8 +71,8 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    const id = req.user.id;
-    await User.findByIdAndUpdate(id, { token: null });
+    const { _id } = req.user;
+    await User.findByIdAndUpdate(_id, { token: null });
     res.status(204).end();
   } catch (error) {
     next(error);
@@ -73,8 +81,8 @@ const logout = async (req, res, next) => {
 
 const getCurrentUser = async (req, res, next) => {
   try {
-    const id = req.user.id;
-    const user = await User.findById(id);
+    const { _id } = req.user;
+    const user = await User.findById(_id);
     res.json({
       email: user.email,
       subscription: user.subscription,
@@ -86,10 +94,10 @@ const getCurrentUser = async (req, res, next) => {
 
 const changeSubscription = async (req, res, next) => {
   try {
-    const id = req.user.id;
+    const { _id } = req.user;
     const { subscription } = req.body;
     const user = await User.findByIdAndUpdate(
-      id,
+      _id,
       { subscription },
       { new: true }
     );
