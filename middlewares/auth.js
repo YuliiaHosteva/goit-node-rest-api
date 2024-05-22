@@ -3,17 +3,22 @@ import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 
 const authToken = async (req, res, next) => {
-  const authorizationHeader = req.headers.authorization;
+  try {
+    const authorizationHeader = req.headers.authorization;
 
-  if (!authorizationHeader) {
-    throw HttpError(401, "Not authorized");
-  }
+    if (!authorizationHeader) {
+      throw HttpError(401, "Not authorized");
+    }
 
-  const [bearer, token] = authorizationHeader.split(" ", 2);
+    const [bearer, token] = authorizationHeader.split(" ", 2);
 
-  if (bearer !== "Bearer" || !token) {
-    throw HttpError(401, "Not authorized");
-  }
+    if (bearer !== "Bearer" || !token) {
+      throw HttpError(401, "Not authorized");
+    }
+  } catch (error) {
+    next(error)
+  };
+  
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);

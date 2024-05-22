@@ -29,7 +29,6 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRoutes);
 app.use("/api/contacts", authToken, contactsRoutes);
 app.use("/api/users", authRoutes);
 app.use("/api/users", authToken, userRoutes);
