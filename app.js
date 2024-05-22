@@ -29,8 +29,10 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/contacts", contactsRoutes);
 app.use("/api/contacts", authToken, contactsRoutes);
-app.use("/api/users", authRoutes, userRoutes);
+app.use("/api/users", authRoutes);
+app.use("/api/users", authToken, userRoutes);
 app.use("/avatars", express.static(path.resolve("public/avatars")));
 
 
