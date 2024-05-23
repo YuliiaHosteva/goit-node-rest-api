@@ -1,21 +1,21 @@
-import User from "../model/user.js";
+import User from "../model/userModel.js";
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 
-const checkToken = async (req, res, next) => {
-  const authorizationHeader = req.headers.authorization;
-
-  if (!authorizationHeader) {
-    throw HttpError(401, "Not authorized");
-  }
-
-  const [bearer, token] = authorizationHeader.split(" ", 2);
-
-  if (bearer !== "Bearer") {
-    throw HttpError(401, "Not authorized");
-  }
-
+const authToken = async (req, res, next) => {
   try {
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+      throw HttpError(401, "Not authorized");
+    }
+
+    const [bearer, token] = authorizationHeader.split(" ", 2);
+
+    if (bearer !== "Bearer" || !token) {
+      throw HttpError(401, "Not authorized");
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const user = await User.findById(decoded.id);
 
@@ -28,7 +28,7 @@ const checkToken = async (req, res, next) => {
     }
 
     req.user = {
-      id: user._id,
+      _id: user._id,
     };
 
     next();
@@ -37,4 +37,4 @@ const checkToken = async (req, res, next) => {
   }
 };
 
-export default checkToken;
+export default authToken;
