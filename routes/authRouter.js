@@ -20,11 +20,6 @@ authRouter.get("/logout", authToken, logout);
 
 authRouter.get("/current", authToken, getCurrentUser);
 
-authRouter.patch(
-  "",
-  authToken,
-  validateBody(subscriptionSchema),
-  changeSubscription
-);
+authRouter.patch("", authToken, validateBody(subscriptionSchema), changeSubscription);
 
 export default authRouter;

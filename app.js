@@ -14,6 +14,7 @@ import userRoutes from "./routes/usersRouter.js"
 const app = express();
 
 const DB_URI = process.env.DB_URI;
+const PORT = process.env.PORT || 3000;
 
 mongoose
   .connect(DB_URI)
@@ -31,7 +32,7 @@ app.use(express.json());
 
 app.use("/api/contacts", authToken, contactsRoutes);
 app.use("/api/users", authRoutes);
-app.use("/api/users", authToken, userRoutes);
+app.use("/users", userRoutes);
 app.use("/avatars", express.static(path.resolve("public/avatars")));
 
 
@@ -44,6 +45,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-app.listen(3000, () => {
-  console.log("Server is running. Use our API on port: 3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
