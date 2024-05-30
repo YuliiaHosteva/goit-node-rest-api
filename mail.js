@@ -22,8 +22,7 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const sendVerificationMail = async ({ to, verificationToken }, next) => {
-  try {
+const sendVerificationMail = async ({ to, verificationToken }) => {
     await transport.sendMail({
       to,
       from: MAILTRAP_OWNER_EMAIL,
@@ -48,9 +47,6 @@ const sendVerificationMail = async ({ to, verificationToken }, next) => {
         Thank you for using our service!
         Best regards,`,
     });
-  } catch (error) {
-    next(error);
-  }
 };
 
 export { sendVerificationMail };
