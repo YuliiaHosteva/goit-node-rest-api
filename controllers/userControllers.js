@@ -2,15 +2,17 @@ import fs from "node:fs/promises";
 import User from "../model/userModel.js";
 import path from "node:path";
 import Jimp from "jimp";
+import HttpError from "../helpers/HttpError.js";
+import { sendVerificationMail } from "../mail.js";
 
 const uploadAvatar = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).send({ message: "File not provided" });
+      throw HttpError(400, "File not provided");
     }
 
     if (!req.user || !req.user._id) {
-      return res.status(401).send({ message: "Not authorized" });
+      throw HttpError(401, "Not authorized");
     }
 
     const tempPath = req.file.path;
@@ -30,8 +32,7 @@ const uploadAvatar = async (req, res, next) => {
     );
 
     if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
+      throw HttpError(404, "User not found");    }
 
     res.send({
       avatarURL,
@@ -41,4 +42,55 @@ const uploadAvatar = async (req, res, next) => {
   }
 };
 
-export { uploadAvatar };
+const verifyUser = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({ verificationToken });
+
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+
+    await User.findByIdAndUpdate(user._id, {
+      verificationToken: null,
+      verify: true,
+    });
+
+    res.send({ message: "Verification successful" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const requestVerificationToken = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+
+    if (user.verify) {
+      throw HttpError(400, "Verification has already been passed");
+    }
+
+    if (user.verificationToken = null) 
+      throw HttpError(401, "User already verificated"
+    )
+
+    sendVerificationMail({
+      to: email,
+      verificationToken: user.verificationToken,
+    });
+
+    res.send({
+      message: "Verification email sent",
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { uploadAvatar, verifyUser, requestVerificationToken };

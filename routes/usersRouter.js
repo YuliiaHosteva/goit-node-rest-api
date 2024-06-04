@@ -1,9 +1,15 @@
 import express from 'express';
-import { uploadAvatar } from "../controllers/userControllers.js"
+import { uploadAvatar, verifyUser, requestVerificationToken } from "../controllers/userControllers.js"
 import upload from "../middlewares/upload.js"
+import { verificationTokenSchema } from '../schemas/usersSchemas.js';
+import validateBody from '../helpers/validateBody.js';
 
-const router = express.Router();
+const userRouter = express.Router();
 
-router.patch("/avatar", upload.single("avatar"), uploadAvatar);
+userRouter.patch("/avatar", upload.single("avatar"), uploadAvatar);
 
-export default router;
+userRouter.get("/verify/:verificationToken", verifyUser);
+
+userRouter.post("/verify", validateBody(verificationTokenSchema), requestVerificationToken);
+
+export default userRouter;
